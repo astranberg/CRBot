@@ -68,7 +68,6 @@ Global $aPixel_cards[48][5] = [["archer", 0, 14389367, 0, 0], _
 		["wizard", 8276282, 4200478, 5842985, 6369321], _
 		["xbow", 0, 0, 0, 0], _
 		["zap", 0, 0, 0, 0]]
-;~ 		["", 0, 0, 0, 0], _
 Global $aCardSlots[4]
 
 
@@ -642,19 +641,41 @@ Func _WaitForPixel($a, $timeout = 0)
 
 EndFunc   ;==>_WaitForPixel
 
-Func _CanFindPixel($a)
+Func _CanFindPixel($a, $sVari = 5, $Ignore = "")
 
-	If PixelGetColor($a[0], $a[1], $AndroidHWND) = $a[2] Then
-		Return 1
-	Else
-		Return 0
-	EndIf
+	;--> Convert dec to hex
+	$nColor1 = Hex(PixelGetColor($a[0], $a[1], $AndroidHWND))
+	$nColor2 = Hex($a[2])
+
+
+	$Red1 = _WinAPI_GetRValue($nColor1)
+	$Blue1 = _WinAPI_GetBValue($nColor1)
+	$Green1 = _WinAPI_GetGValue($nColor1)
+
+	$Red2 = _WinAPI_GetRValue($nColor2)
+	$Blue2 = _WinAPI_GetBValue($nColor2)
+	$Green2 = _WinAPI_GetGValue($nColor2)
+
+	Switch $Ignore
+		Case "Red" ; mask RGB - Red
+			If Abs($Blue1 - $Blue2) > $sVari Then Return False
+			If Abs($Green1 - $Green2) > $sVari Then Return False
+		Case "Heroes" ; mask RGB - Green
+			If Abs($Blue1 - $Blue2) > $sVari Then Return False
+			If Abs($Red1 - $Red2) > $sVari Then Return False
+		Case Else
+			If Abs($Blue1 - $Blue2) > $sVari Then Return False
+			If Abs($Green1 - $Green2) > $sVari Then Return False
+			If Abs($Red1 - $Red2) > $sVari Then Return False
+	EndSwitch
+
+	Return True
 
 EndFunc   ;==>_CanFindPixel
 
 Func _ClickPixel($a)
 
-	If PixelGetColor($a[0], $a[1], $AndroidHWND) = $a[2] Then
+	If _CanFindPixel($a) Then
 ;~ 		MouseClick($MOUSE_CLICK_PRIMARY, $AndroidPos[0] + $a[0], $AndroidPos[1] + $a[1])
 		_SendADB("-a shell input tap " & $a[0] & " " & $a[1])
 		Return 1
@@ -670,9 +691,52 @@ Func _ClickCoords($x, $y)
 	Return 1
 
 EndFunc   ;==>_ClickCoords
+
 #EndRegion
 
 #Region Outdated Functions
+
+;~ ; #FUNCTION# ====================================================================================================================
+;~ ; Name ..........: _ColorCheck
+;~ ; Description ...: Checks if the color components exceed $sVari and returns true if they are below $sVari.
+;~ ; Syntax ........: _ColorCheck($nColor1, $nColor2, $sVari = 5, $Ignore = "")
+;~ ; Parameters ....: $nColor1, $nColor2: a Hex string color code eg: "FFFFFF", $sVari: a tolerance level, $Ignore : Ignore eg: "Red" to ignore the "Red" RGB component
+;~ ; Return values .: True or False
+;~ ; Author ........:
+;~ ; Modified ......: Hervidero (2015)
+;~ ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2016
+;~ ;                  MyBot is distributed under the terms of the GNU GPL
+;~ ; Related .......:
+;~ ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
+;~ ; Example .......: No
+;~ ; ===============================================================================================================================
+
+;~ Func _ColorCheck($nColor1, $nColor2, $sVari = 5, $Ignore = "")
+;~ 	Local $Red1, $Red2, $Blue1, $Blue2, $Green1, $Green2
+
+;~ 	$Red1 = Dec(StringMid(String($nColor1), 1, 2))
+;~ 	$Blue1 = Dec(StringMid(String($nColor1), 3, 2))
+;~ 	$Green1 = Dec(StringMid(String($nColor1), 5, 2))
+
+;~ 	$Red2 = Dec(StringMid(String($nColor2), 1, 2))
+;~ 	$Blue2 = Dec(StringMid(String($nColor2), 3, 2))
+;~ 	$Green2 = Dec(StringMid(String($nColor2), 5, 2))
+
+;~ 	Switch $Ignore
+;~ 		Case "Red" ; mask RGB - Red
+;~ 			If Abs($Blue1 - $Blue2) > $sVari Then Return False
+;~ 			If Abs($Green1 - $Green2) > $sVari Then Return False
+;~ 		Case "Heroes" ; mask RGB - Green
+;~ 			If Abs($Blue1 - $Blue2) > $sVari Then Return False
+;~ 			If Abs($Red1 - $Red2) > $sVari Then Return False
+;~ 		Case Else
+;~ 			If Abs($Blue1 - $Blue2) > $sVari Then Return False
+;~ 			If Abs($Green1 - $Green2) > $sVari Then Return False
+;~ 			If Abs($Red1 - $Red2) > $sVari Then Return False
+;~ 	EndSwitch
+
+;~ 	Return True
+;~ EndFunc   ;==>_ColorCheck
 ;----------> Don't use anymore. We use pixels instead now.
 ;~ Func _ClickPicture($filename)
 ;~ 	_GDIPlus_Startup()
