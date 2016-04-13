@@ -62,14 +62,14 @@ Global $aPixel_freechest_ready[3] = [148, 173, Dec('FFFFFF')]
 Global $aPixel_freechest_beingopened[3] = [295, 484, Dec('B82E2B')]
 Global $aPixel_startunlock[3] = [50, 350, Dec('636A7C')]
 Global $aPixel_arenachests_locked[7][5] = [["Wooden", 0, 0, 0, 0], _
-		["Silver", 8429748, 5007741, 0, 5531767], _
+		["Silver", 8429748, 5007741, 8429748, 5531767], _
 		["Gold", 0, 14720000, 15246336, 11170830], _
 		["Giant", 0, 0, 4152167, 0], _
 		["Magical", 0, 0, 0, 0], _
 		["Super Magical", 0, 0, 0, 0]]
 
 Global $aPixel_arenachests_unlocking[7][5] = [["Wooden", 0, 0, 0, 0], _
-		["Silver", 5536916, 7509418, 0, 6456987], _
+		["Silver", 5536916, 7509418, 5537170, 6456987], _
 		["Gold", 0, 0, 0, 7623936], _
 		["Giant", 0, 0, 8086555, 0], _
 		["Magical", 0, 0, 0, 0], _
@@ -77,7 +77,7 @@ Global $aPixel_arenachests_unlocking[7][5] = [["Wooden", 0, 0, 0, 0], _
 
 Global $aPixel_arenachests_unlocked[7][5] = [["Wooden", 0, 0, 0, 0], _
 		["Silver", 8034990, 9482432, 0, 6588570], _
-		["Gold", 0, 0, 0, 4093310], _
+		["Gold", 3443620, 0, 0, 4093310], _
 		["Giant", 0, 0, 7374736, 0], _
 		["Magical", 0, 0, 0, 0], _
 		["Super Magical", 0, 0, 0, 0]]
@@ -122,6 +122,7 @@ Global $aPixel_elixir[10][4] = [[1, Dec('F088F4'), 161, 870], _
 
 ;--> Popup menus
 Global $aPixel_connectionlost[3] = [250, 500, Dec('282828')]
+Global $aPixel_donation_received[3] = [448, 212, Dec('E42424')]
 
 
 ;----------------------------------CHANGES NEEDED
@@ -278,6 +279,12 @@ Func _FindMenu($sMenuToFind, $timeout = 0)
 		;--> Check for disconnection menu
 		If _CanFindPixel($aPixel_connectionlost) = 1 Then
 			_ClickPixel($aPixel_connectionlost)
+		EndIf
+
+		;--> Check for donatios received button.
+		If _CanFindPixel($aPixel_donation_received) = 1 Then
+			MsgBox(0,0,'closing out of cards received!')
+			_ClickPixel($aPixel_donation_received)
 		EndIf
 
 		;--> Check for time out

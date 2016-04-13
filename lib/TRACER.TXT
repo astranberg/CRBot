@@ -1358,3 +1358,8 @@
 		Started  Mon Apr 11 19:43:32 2016
 
            590.716µS|ChangeMode(231) => m_bDebugGraphique=1, m_DebugModeTxt=  E3
+
+****************************** FastFind 2.2 (c)FastFrench 2013 ********
+		Started  Wed Apr 13 09:56:18 2016
+
+           761.597µS|ChangeMode(231) => m_bDebugGraphique=1, m_DebugModeTxt=  E3
