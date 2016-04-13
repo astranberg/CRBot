@@ -20,20 +20,55 @@
 #include <WinAPIGdi.au3>
 
 #Region Declare Variables
-Global $aPixel_cards[14][5] = [["giant_skeleton", 7825243, 13020827, 14600886, 12955292], _
-		["barbarians", 15312398, 8866055, 7028993, 5978368], _
-		["giant", 14060387, 13006682, 11757641, 8142113], _
-		["goblins", 10273101, 5975302, 7941152, 6432784], _
-		["musketeer", 4858944, 1189965, 14535357, 8079682], _
-		["spear_goblins", 10800172, 5852974, 6973803, 6972514], _
-		["wizard", 8276282, 4200478, 5842985, 6369321], _
-		["ice_wizard", 5780531, 5254444, 5452851, 6041904], _
+Global $aPixel_cards[48][5] = [["archer", 0, 14389367, 0, 0], _
+		["arrows", 13557486, 0, 0, 0], _
+		["baby_dragon", 0, 0, 0, 0], _
 		["balloon", 16749667, 14188120, 10906443, 16049102], _
-		["hog", 2892307, 7094837, 984064, 1050624], _
-		["prince", 4928552, 7164482, 6570547, 5454378], _
+		["barbarian_hut", 0, 0, 0, 0], _
+		["barbarians", 15312398, 8866055, 7028993, 5978368], _
+		["bomber", 0, 0, 0, 0], _
 		["bomb_tower", 7758193, 7021830, 8072200, 9121032], _
+		["cannon", 1645590, 1644823, 1645840, 1648656], _
 		["dark_prince", 5594467, 6512994, 6975867, 13026238], _
-		["cannon", 1645590, 1644823, 1645840, 1648656]]
+		["elixir_collector", 0, 0, 0, 0], _
+		["fireball", 0, 0, 0, 0], _
+		["freeze", 0, 0, 0, 0], _
+		["giant", 14060387, 13006682, 11757641, 8142113], _
+		["giant_skeleton", 7825243, 13020827, 14600886, 12955292], _
+		["goblin_barrel", 0, 0, 0, 0], _
+		["goblin_hut", 0, 0, 0, 0], _
+		["goblins", 10273101, 5975302, 7941152, 6432784], _
+		["golem", 0, 0, 0, 0], _
+		["hog", 2892307, 7094837, 984064, 1050624], _
+		["ice_wizard", 5780531, 5254444, 5452851, 6041904], _
+		["inferno_tower", 0, 9396057, 0, 0], _
+		["knight", 0, 0, 0, 0], _
+		["lightening", 0, 0, 0, 0], _
+		["mini_pekka", 0, 0, 0, 0], _
+		["minion_horde", 0, 0, 0, 0], _
+		["minions", 0, 0, 0, 0], _
+		["mirror", 0, 0, 0, 0], _
+		["mortar", 0, 0, 5927333, 0], _
+		["musketeer", 4858944, 1189965, 14535357, 8079682], _
+		["pekka", 0, 0, 0, 0], _
+		["poison", 0, 0, 0, 0], _
+		["prince", 4928552, 7164482, 6570547, 5454378], _
+		["princeess", 0, 0, 0, 0], _
+		["rage", 0, 0, 0, 0], _
+		["rocket", 0, 0, 0, 15580546], _
+		["royale_giant", 0, 0, 0, 0], _
+		["skeleton_army", 0, 0, 0, 0], _
+		["skeletons", 0, 0, 0, 0], _
+		["spear_goblins", 10800172, 5852974, 6973803, 6972514], _
+		["tesla", 0, 0, 0, 0], _
+		["three_musketeers", 0, 0, 0, 0], _
+		["tombstone", 0, 0, 0, 0], _
+		["valkerie", 0, 0, 0, 0], _
+		["witch", 0, 0, 0, 0], _
+		["wizard", 8276282, 4200478, 5842985, 6369321], _
+		["xbow", 0, 0, 0, 0], _
+		["zap", 0, 0, 0, 0]]
+;~ 		["", 0, 0, 0, 0], _
 Global $aCardSlots[4]
 
 
@@ -75,7 +110,7 @@ Global $aPixel_arenachests_unlocking[7][5] = [["Wooden", 0, 0, 0, 0], _
 		["Super Magical", 0, 0, 0, 0]]
 
 Global $aPixel_arenachests_unlocked[7][5] = [["Wooden", 0, 0, 0, 0], _
-		["Silver", 8034990, 9482432, 0, 6588570], _
+		["Silver", 8034990, 9482432, 7575206, 6588570], _
 		["Gold", 3443620, 0, 0, 4093310], _
 		["Giant", 0, 0, 7374736, 0], _
 		["Magical", 0, 0, 0, 0], _
@@ -532,7 +567,7 @@ Func _PlayGame()
 		$aCardSlots[3] = ''
 		For $iTroop = 0 To UBound($aPixel_cards, 1) - 1
 			For $iCardSlot = 1 To 4
-				Dim $iCardarr = [Eval("card" & $iCardSlot & "x"), Eval("card" & $iCardSlot & "y"), $aPixel_cards[$iTroop][$iCardSlot]]
+				Dim $iCardarr = [Eval("iCard" & $iCardSlot & "x"), Eval("iCard" & $iCardSlot & "y"), $aPixel_cards[$iTroop][$iCardSlot]]
 				;MsgBox(0,0,$iCardarr[0] & @CRLF & $iCardarr[1] & @CRLF & $iCardarr[2] & @CRLF & $aPixel_cards[$iTroop][0] & @CRLF)
 				If _CanFindPixel($iCardarr) = 1 Then
 					$aCardSlots[$iCardSlot - 1] = $aPixel_cards[$iTroop][0]
@@ -581,7 +616,7 @@ EndFunc   ;==>_PlayGame
 
 Func _DeployTroop($iCardNo, $x_offset, $y_offset)
 	;--> Click on card
-	_ClickCoords(Eval('card' & $iCardNo & 'x'), Eval('card' & $iCardNo & 'y'))
+	_ClickCoords(Eval('iCard' & $iCardNo & 'x'), Eval('iCard' & $iCardNo & 'y'))
 
 	;--> Click on deployment spot
 	MsgBox(0, 0, 249 + (24 * $x_offset) & @CRLF & 498 + (19 * $y_offset))
