@@ -12,13 +12,12 @@
 #RequireAdmin
 
 #include <ScreenCapture.au3>
-#include <ImageSearch.au3>
+#include <lib/ImageSearch.au3>
 #include <GDIPlus.au3>
 #include <AutoItConstants.au3>
 #include <Array.au3>
 #include <StringConstants.au3>
 #include <WinAPIGdi.au3>
-#include <FastFind.au3>
 
 #Region Declare Variables
 Global $aPixel_cards[14][5] = [["giant_skeleton", 7825243, 13020827, 14600886, 12955292], _
@@ -82,7 +81,7 @@ Global $aPixel_arenachests_unlocked[7][5] = [["Wooden", 0, 0, 0, 0], _
 		["Magical", 0, 0, 0, 0], _
 		["Super Magical", 0, 0, 0, 0]]
 
-Global $aPixel_emptychest[5] = ["Empty", 1989510, 1989253, 1989253, 0]
+Global $aPixel_emptychest[5] = ["Empty", 1989510, 1989253, 1989253, 1988482]
 
 ;---------------------------->[Chest Type, Chest Status, Chest Arena]
 Global $aChestSlots[4][4] = [["", "", ""], _
@@ -325,15 +324,15 @@ Func _OpenArenaChest()
 	$bOneAlreadyBeingOpened = False
 	For $iChestSlot = 1 To 4
 		For $iChestType = 0 To UBound($aPixel_arenachests_unlocking, 1) - 1
-			Dim $aLockedChest = [Eval("chest" & $iChestSlot & "x"), Eval("chest" & $iChestSlot & "y"), $aPixel_arenachests_locked[$iChestType][$iChestSlot]]
-			Dim $aunlockingChest = [Eval("chest" & $iChestSlot & "x"), Eval("chest" & $iChestSlot & "y"), $aPixel_arenachests_unlocking[$iChestType][$iChestSlot]]
-			Dim $aUnlockedChest = [Eval("chest" & $iChestSlot & "x"), Eval("chest" & $iChestSlot & "y"), $aPixel_arenachests_unlocked[$iChestType][$iChestSlot]]
-			Dim $aEmptyChest = [Eval("chest" & $iChestSlot & "x"), Eval("chest" & $iChestSlot & "y"), $aPixel_emptychest[$iChestSlot]]
+			Dim $aLockedChest = [Eval("iChest" & $iChestSlot & "x"), Eval("iChest" & $iChestSlot & "y"), $aPixel_arenachests_locked[$iChestType][$iChestSlot]]
+			Dim $aUnlockingChest = [Eval("iChest" & $iChestSlot & "x"), Eval("iChest" & $iChestSlot & "y"), $aPixel_arenachests_unlocking[$iChestType][$iChestSlot]]
+			Dim $aUnlockedChest = [Eval("iChest" & $iChestSlot & "x"), Eval("iChest" & $iChestSlot & "y"), $aPixel_arenachests_unlocked[$iChestType][$iChestSlot]]
+			Dim $aEmptyChest = [Eval("iChest" & $iChestSlot & "x"), Eval("iChest" & $iChestSlot & "y"), $aPixel_emptychest[$iChestSlot]]
 			If _CanFindPixel($aLockedChest) Then
 				$aChestSlots[$iChestSlot - 1][0] = $aPixel_arenachests_locked[$iChestType][0]
 				$aChestSlots[$iChestSlot - 1][1] = "Locked"
 				$aChestSlots[$iChestSlot - 1][2] = 8
-			ElseIf _CanFindPixel($aunlockingChest) Then
+			ElseIf _CanFindPixel($aUnlockingChest) Then
 				$aChestSlots[$iChestSlot - 1][0] = $aPixel_arenachests_unlocking[$iChestType][0]
 				$aChestSlots[$iChestSlot - 1][1] = "Unlocking"
 				$aChestSlots[$iChestSlot - 1][2] = 8
@@ -376,7 +375,7 @@ Func _OpenArenaChest()
 				;MsgBox(0,0,$aChestSlots[$iChestSlot - 1][$iIndex_ChestSlots] & @CRLF & $aUnlockOrder[$iUnlockOrder])
 				If $aChestSlots[$iChestSlot - 1][$iIndex_ChestSlots] = $aUnlockOrder[$iUnlockOrder] And $aChestSlots[$iChestSlot - 1][1] = "Locked" Then
 					;MsgBox(0,0,'GOING TO UNLOCK CHEST!!!')
-					_ClickCoords(Eval("chest" & $iChestSlot & "x"), Eval("chest" & $iChestSlot & "y"))
+					_ClickCoords(Eval("iChest" & $iChestSlot & "x"), Eval("iChest" & $iChestSlot & "y"))
 ;~ 					_WaitForPixel($aPixel_startunlock)
 					Sleep(2000)
 					_ClickCoords(250, 575)
@@ -393,7 +392,7 @@ Func _OpenArenaChest()
 		Sleep(1000)
 		For $iChestSlot = 1 To 4
 			If $aChestSlots[$iChestSlot - 1][1] = "Unlocked" Then
-				_ClickCoords(Eval("chest" & $iChestSlot & "x"), Eval("chest" & $iChestSlot & "y"))
+				_ClickCoords(Eval("iChest" & $iChestSlot & "x"), Eval("iChest" & $iChestSlot & "y"))
 				;--> click some more to get stuff
 				Dim $atemp = [260, 360, Dec('0C3055')]
 				_WaitForPixel($atemp)
