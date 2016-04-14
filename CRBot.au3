@@ -247,8 +247,13 @@ Global $iCard4y = 800
 #Region User Preferences
 ;--> Get user preferences (not yet implimented)
 ConsoleWrite('Reading user preferences' & @CRLF)
-$iChest_unlock_order = "Quickest"
-$openunlockedchests = True
+$sChest_unlock_order = "Quickest"
+$bOpenFreeChests = True
+$bUnlockChests = True
+$bOpenUnlockedChests = True
+$bRequestCards = True
+$bDonateTroops = True
+$bPlayTrainer = True
 #EndRegion
 
 #Region Loop through doing stuff with Clash Royale
@@ -257,10 +262,12 @@ While 1
 	ConsoleWrite('Finding Battle Menu' & @CRLF)
 	_FindMenu('battle')
 
-	ConsoleWrite('Opening Free Chests' & @CRLF)
-	While _OpenFreeChest() = 1 ;--> If there's one free chest there could be another
-		Sleep(1000)
-	WEnd
+	If $bOpenFreeChests Then
+		ConsoleWrite('Opening Free Chests' & @CRLF)
+		While _OpenFreeChest() = 1 ;--> If there's one free chest there could be another
+			Sleep(1000)
+		WEnd
+	EndIf
 
 	;temp stufffffz
 	ConsoleWrite("Chest 1 Pixel Color: " & PixelGetColor($iChest1x, $iChest1y) & @CRLF)
@@ -268,17 +275,25 @@ While 1
 	ConsoleWrite("Chest 3 Pixel Color: " & PixelGetColor($iChest3x, $iChest3y) & @CRLF)
 	ConsoleWrite("Chest 4 Pixel Color: " & PixelGetColor($iChest4x, $iChest4y) & @CRLF)
 
-	ConsoleWrite('Opening Arena Chests' & @CRLF)
-	_OpenArenaChest()
+	If $bUnlockChests Or $bOpenUnlockedChests Then
+		ConsoleWrite('Opening Arena Chests' & @CRLF)
+		_OpenArenaChest()
+	EndIf
 
-	ConsoleWrite('Requesting Cards' & @CRLF)
-	_RequestCards()
+	If $bRequestCards Then
+		ConsoleWrite('Requesting Cards' & @CRLF)
+		_RequestCards()
+	EndIf
 
-	ConsoleWrite('Donating Troops' & @CRLF)
-	_DonateTroops()
+	If $bDonateTroops Then
+		ConsoleWrite('Donating Troops' & @CRLF)
+		_DonateTroops()
+	EndIf
 
-	ConsoleWrite('Playing Game' & @CRLF)
-	_PlayGame()
+	If $bPlayTrainer Then
+		ConsoleWrite('Playing Game' & @CRLF)
+		_PlayGame()
+	EndIf
 
 	ConsoleWrite('Game Finished; sleeping for 5 seconds' & @CRLF)
 	Sleep(5000)
@@ -395,17 +410,17 @@ Func _OpenArenaChest()
 
 	;--> Unlock according to user specifications (Quickest first, lowest arena first, longest first, highest arena first)
 	;---------> NOTE: Unlock refers starting the timer to be able to Open (see below) the chest.
-	If Not $bOneAlreadyBeingOpened Then
-		If $iChest_unlock_order = "Quickest" Then ;--> Wooden, Silver, Golden, Giant, Magical, Super Magical
+	If $bUnlockChests And Not $bOneAlreadyBeingOpened Then
+		If $sChest_unlock_order = "Quickest" Then ;--> Wooden, Silver, Golden, Giant, Magical, Super Magical
 			;----------> By Type: order
 			Dim $aUnlockOrder = [0, 'Wooden', 'Silver', 'Golden', 'Giant', 'Magical', 'Super Magical']
-		ElseIf $iChest_unlock_order = "Longest" Then ;--> Super Magical, Magical, Giant, Golden, Silver
+		ElseIf $sChest_unlock_order = "Longest" Then ;--> Super Magical, Magical, Giant, Golden, Silver
 			;----------> By Type: order
 			Dim $aUnlockOrder = [0, 'Super Magical', 'Magical', 'Giant', 'Golden', 'Silver', 'Wooden']
-		ElseIf $iChest_unlock_order = "Highest" Then ;--> Arenas 8-1
+		ElseIf $sChest_unlock_order = "Highest" Then ;--> Arenas 8-1
 			;----------> By Arena: order
 			Dim $aUnlockOrder = [2, 8, 7, 6, 5, 4, 3, 2, 1]
-		ElseIf $iChest_unlock_order = "Lowest" Then ;--> Arenas 1-8
+		ElseIf $sChest_unlock_order = "Lowest" Then ;--> Arenas 1-8
 			;----------> By Arena: order
 			Dim $aUnlockOrder = [2, 1, 2, 3, 4, 5, 6, 7, 8]
 		EndIf
@@ -430,7 +445,7 @@ Func _OpenArenaChest()
 
 	;--> Open arena chests according to user specifications (one slot must be clear, open all, )
 	;---------> NOTE: Open refers to actually receiving the cards inside the chest after it has already been unlocked (see above).
-	If $openunlockedchests Then
+	If $bOpenUnlockedChests Then
 		Sleep(1000)
 		For $iChestSlot = 1 To 4
 			If $aChestSlots[$iChestSlot - 1][1] = "Unlocked" Then
@@ -486,7 +501,9 @@ Func _DonateTroops()
 EndFunc   ;==>_DonateTroops
 
 Func _RequestCards()
+	;--> Get to the clan tab
 	_FindMenu('clan')
+
 	If _CanFindPixel($aPixel_requestcards_ready) = 1 Then
 		_ClickPixel($aPixel_requestcards_ready)
 
