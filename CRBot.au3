@@ -96,7 +96,7 @@ Global $aPixel_freechest_beingopened[3] = [295, 484, Dec('B82E2B')]
 Global $aPixel_startunlock[3] = [50, 350, Dec('636A7C')]
 Global $aPixel_arenachests_locked[7][5] = [["Wooden", 0, 0, 0, 0], _
 		["Silver", 8429748, 5007741, 8429748, 5531767], _
-		["Gold", 0, 14720000, 15246336, 11170830], _
+		["Gold", 13997568, 14720000, 15246336, 11170830], _
 		["Giant", 0, 0, 4152167, 0], _
 		["Magical", 0, 0, 0, 0], _
 		["Super Magical", 0, 0, 0, 0]]
@@ -182,6 +182,14 @@ Global $aPixel_crowns_3[3] = [468, 464, Dec('66CCFF')]
 ;--> Check if already launched
 $AndroidHWND = WinGetHandle("BlueStacks Android Plugin")
 ConsoleWrite('Searching for Clash Royale' & @CRLF)
+If $AndroidHWND <> 0 Then
+	If _FindMenu('battle', 2000) = 0 Then
+		_SendADB("connect localhost:5555")
+		Sleep(1000)
+		_SendADB("-a shell am start -n com.supercell.clashroyale/.GameApp")
+		Sleep(1000)
+	EndIf
+EndIf
 If _FindMenu('battle', 5000) = 0 Then
 	;-->Set correct resolution and close Bluestacks
 	ConsoleWrite('Setting correct resolution and closing Bluestacks' & @CRLF)
@@ -193,8 +201,8 @@ If _FindMenu('battle', 5000) = 0 Then
 	Global $AndroidPID = ShellExecute("C:\Program Files (x86)\BlueStacks\" & "HD-Frontend.exe", "Android")
 
 	;--> Wait Bluestacks loaded
-	Global $aBluestacksLoaded[3] = [100, 100, Dec('F38025')]
-	While _CanFindPixel($aBluestacksLoaded) = 0
+	Global $aBluestacksNotLoaded[3] = [100, 100, Dec('2393D5')]
+	While _CanFindPixel($aBluestacksNotLoaded) = 1
 	WEnd
 
 	;--> Launch ClashRoyale
@@ -217,6 +225,7 @@ WEnd
 ;--> Resize
 ConsoleWrite('Resizing and moving Bluestacks' & @CRLF)
 WinActivate($AndroidHWND)
+;~ WinMove($AndroidHWND, '', 0, 0, 425, 765)
 WinMove($AndroidHWND, '', 0, 0, 500, 900)
 
 Sleep(1000)
@@ -270,8 +279,8 @@ While 1
 
 	ConsoleWrite('Playing Game' & @CRLF)
 	_PlayGame()
-	ConsoleWrite('Game Finished; sleeping for 5 seconds' & @CRLF)
 
+	ConsoleWrite('Game Finished; sleeping for 5 seconds' & @CRLF)
 	Sleep(5000)
 WEnd
 #EndRegion
@@ -316,7 +325,6 @@ Func _FindMenu($sMenuToFind, $timeout = 0)
 
 		;--> Check for donatios received button.
 		If _CanFindPixel($aPixel_donation_received) = 1 Then
-			MsgBox(0,0,'closing out of cards received!')
 			_ClickPixel($aPixel_donation_received)
 		EndIf
 
