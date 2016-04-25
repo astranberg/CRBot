@@ -94,21 +94,21 @@ Global $aPixel_freechest_notready[3] = [62, 162, Dec('583D25')]
 Global $aPixel_freechest_ready[3] = [148, 173, Dec('FFFFFF')]
 Global $aPixel_freechest_beingopened[3] = [295, 484, Dec('B82E2B')]
 Global $aPixel_startunlock[3] = [50, 350, Dec('636A7C')]
-Global $aPixel_arenachests_locked[7][5] = [["Wooden", 0, 0, 0, 0], _
+Global $aPixel_arenachests_locked[6][5] = [["Wooden", 0, 0, 0, 0], _
 		["Silver", 8429748, 5007741, 8429748, 5531767], _
 		["Gold", 13997568, 14720000, 15246336, 11170830], _
 		["Giant", 0, 0, 4152167, 0], _
 		["Magical", 0, 0, 0, 0], _
 		["Super Magical", 0, 0, 0, 0]]
 
-Global $aPixel_arenachests_unlocking[7][5] = [["Wooden", 0, 0, 0, 0], _
+Global $aPixel_arenachests_unlocking[6][5] = [["Wooden", 0, 0, 0, 0], _
 		["Silver", 5536916, 7509418, 5537170, 6456987], _
-		["Gold", 0, 0, 0, 7623936], _
+		["Gold", 0, 3313326, 0, 7623936], _
 		["Giant", 0, 0, 8086555, 0], _
 		["Magical", 0, 0, 0, 0], _
 		["Super Magical", 0, 0, 0, 0]]
 
-Global $aPixel_arenachests_unlocked[7][5] = [["Wooden", 0, 0, 0, 0], _
+Global $aPixel_arenachests_unlocked[6][5] = [["Wooden", 0, 0, 0, 0], _
 		["Silver", 8034990, 9482432, 7575206, 6588570], _
 		["Gold", 3443620, 0, 0, 4093310], _
 		["Giant", 0, 0, 7374736, 0], _
@@ -155,7 +155,7 @@ Global $aPixel_elixir[10][4] = [[1, Dec('F088F4'), 161, 870], _
 
 ;--> Popup menus
 Global $aPixel_connectionlost[3] = [250, 500, Dec('282828')]
-Global $aPixel_donation_received[3] = [448, 212, Dec('E42424')]
+Global $aPixel_donation_received[3] = [450, 200, Dec('FFACD6')]
 
 
 ;----------------------------------CHANGES NEEDED
@@ -183,7 +183,7 @@ Global $aPixel_crowns_3[3] = [468, 464, Dec('66CCFF')]
 $AndroidHWND = WinGetHandle("BlueStacks Android Plugin")
 ConsoleWrite('Searching for Clash Royale' & @CRLF)
 If $AndroidHWND <> 0 Then
-	If _FindMenu('battle', 2000) = 0 Then
+	If _FindMenu('battle', 5000) = 0 Then
 		_SendADB("connect localhost:5555")
 		Sleep(1000)
 		_SendADB("-a shell am start -n com.supercell.clashroyale/.GameApp")
@@ -201,8 +201,8 @@ If _FindMenu('battle', 5000) = 0 Then
 	Global $AndroidPID = ShellExecute("C:\Program Files (x86)\BlueStacks\" & "HD-Frontend.exe", "Android")
 
 	;--> Wait Bluestacks loaded
-	Global $aBluestacksNotLoaded[3] = [100, 100, Dec('2393D5')]
-	While _CanFindPixel($aBluestacksNotLoaded) = 1
+	Global $aBluestacksLoaded[3] = [100, 100, Dec('F38025')]
+	While _CanFindPixel($aBluestacksLoaded, 2) = 0
 	WEnd
 
 	;--> Launch ClashRoyale
@@ -251,9 +251,9 @@ $sChest_unlock_order = "Quickest"
 $bOpenFreeChests = True
 $bUnlockChests = True
 $bOpenUnlockedChests = True
-$bRequestCards = True
-$bDonateTroops = True
-$bPlayTrainer = True
+$bRequestCards = False
+$bDonateTroops = False
+$bPlayTrainer = False
 #EndRegion
 
 #Region Loop through doing stuff with Clash Royale
@@ -293,9 +293,9 @@ While 1
 	If $bPlayTrainer Then
 		ConsoleWrite('Playing Game' & @CRLF)
 		_PlayGame()
+		ConsoleWrite('Game Finished; sleeping for 5 seconds' & @CRLF)
 	EndIf
 
-	ConsoleWrite('Game Finished; sleeping for 5 seconds' & @CRLF)
 	Sleep(5000)
 WEnd
 #EndRegion
@@ -311,6 +311,23 @@ Func _FindMenu($sMenuToFind, $timeout = 0)
 	$timer = TimerInit()
 	;--> Get to main menu
 	While _CanFindPixel(Eval('aPixel_in_' & $sMenuToFind)) = 0
+
+		;--> Check for disconnection menu
+		If _CanFindPixel($aPixel_connectionlost) = 1 Then
+			_ClickPixel($aPixel_connectionlost)
+		EndIf
+
+		;--> Check for donatios received button.
+		If _CanFindPixel($aPixel_donation_received) = 1 Then
+			_ClickPixel($aPixel_donation_received)
+		EndIf
+
+		;--> Check for time out
+		If TimerDiff($timer) >= $timeout And $timeout > 0 Then
+			Return 0
+			ExitLoop
+		EndIf
+
 		;--> Figure out which tab we're in
 		$sMenuCurrent = ''
 		For $i = 0 To UBound($aMenuOrder) - 1
@@ -331,22 +348,6 @@ Func _FindMenu($sMenuToFind, $timeout = 0)
 					ExitLoop
 				EndIf
 			Next
-		EndIf
-
-		;--> Check for disconnection menu
-		If _CanFindPixel($aPixel_connectionlost) = 1 Then
-			_ClickPixel($aPixel_connectionlost)
-		EndIf
-
-		;--> Check for donatios received button.
-		If _CanFindPixel($aPixel_donation_received) = 1 Then
-			_ClickPixel($aPixel_donation_received)
-		EndIf
-
-		;--> Check for time out
-		If TimerDiff($timer) >= $timeout And $timeout > 0 Then
-			Return 0
-			ExitLoop
 		EndIf
 
 		Sleep(1000)
@@ -385,20 +386,23 @@ Func _OpenArenaChest()
 			Dim $aUnlockingChest = [Eval("iChest" & $iChestSlot & "x"), Eval("iChest" & $iChestSlot & "y"), $aPixel_arenachests_unlocking[$iChestType][$iChestSlot]]
 			Dim $aUnlockedChest = [Eval("iChest" & $iChestSlot & "x"), Eval("iChest" & $iChestSlot & "y"), $aPixel_arenachests_unlocked[$iChestType][$iChestSlot]]
 			Dim $aEmptyChest = [Eval("iChest" & $iChestSlot & "x"), Eval("iChest" & $iChestSlot & "y"), $aPixel_emptychest[$iChestSlot]]
-			If _CanFindPixel($aLockedChest) Then
+			If _CanFindPixel($aLockedChest, 0) Then
 				$aChestSlots[$iChestSlot - 1][0] = $aPixel_arenachests_locked[$iChestType][0]
 				$aChestSlots[$iChestSlot - 1][1] = "Locked"
 				$aChestSlots[$iChestSlot - 1][2] = 8
-			ElseIf _CanFindPixel($aUnlockingChest) Then
+				ExitLoop
+			ElseIf _CanFindPixel($aUnlockingChest, 0) Then
 				$aChestSlots[$iChestSlot - 1][0] = $aPixel_arenachests_unlocking[$iChestType][0]
 				$aChestSlots[$iChestSlot - 1][1] = "Unlocking"
 				$aChestSlots[$iChestSlot - 1][2] = 8
 				$bOneAlreadyBeingOpened = True
-			ElseIf _CanFindPixel($aUnlockedChest) Then
+				ExitLoop
+			ElseIf _CanFindPixel($aUnlockedChest, 0) Then
 				$aChestSlots[$iChestSlot - 1][0] = $aPixel_arenachests_unlocked[$iChestType][0]
 				$aChestSlots[$iChestSlot - 1][1] = "Unlocked"
 				$aChestSlots[$iChestSlot - 1][2] = 8
-			ElseIf _CanFindPixel($aEmptyChest) Then
+				ExitLoop
+			ElseIf _CanFindPixel($aEmptyChest, 0) Then
 				$aChestSlots[$iChestSlot - 1][0] = "Empty"
 				$aChestSlots[$iChestSlot - 1][1] = "Empty"
 				$aChestSlots[$iChestSlot - 1][2] = 0
@@ -667,6 +671,8 @@ Func _WaitForPixel($a, $timeout = 0)
 EndFunc   ;==>_WaitForPixel
 
 Func _CanFindPixel($a, $sVari = 5, $Ignore = "")
+
+	If $a[2] = 0 Then Return False
 
 	;--> Convert dec to hex
 	$nColor1 = Hex(PixelGetColor($a[0], $a[1], $AndroidHWND))
